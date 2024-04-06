@@ -1,2 +1,3 @@
 # Huffman
-A simple Huffman encoding application made in Haskell.
+
+A simple Huffman coding application made in Haskell.
