@@ -25,6 +25,7 @@ merge x y = Fork (frequency x + frequency y) x y
 
 huffman ∷ [Huffman] → Huffman
 huffman x = build $ sort x where
+    build ∷ [Huffman] → Huffman
     build []      = error "Error"
     build [x]     = x
     build (x:y:r) = build $ insert (merge x y) r
@@ -33,14 +34,15 @@ dictionary ∷ Huffman → [(Symbol, String)]
 dictionary (Leaf _ s)   = [(s, "")]
 dictionary (Fork _ l r) = map (('0' :) <$>) (dictionary l) ++ map (('1' :) <$>) (dictionary r)
 
-encode ∷ String → Huffman → Maybe String
-encode string huffman = concat <$> (sequence $ map (`lookup` (dictionary huffman)) string)
+encode ∷ String → Huffman → String
+encode string huffman = maybe "" id $ concat <$> (sequence $ map (`lookup` (dictionary huffman)) string)
 
 decode ∷ String → Huffman → Maybe String
-decode []     _       = Just ""
-decode string huffman = fst (search string huffman) : decode (snd $ search string huffman) huffman where
-    search c (Leaf _ s)   = if c == s then Just
-    search c (Fork _ l r) = max ('0' : (search c l)) ('1' : (search c r)) 
+decode string huffman = undefined
 
+search ∷ String → Huffman → (Maybe Char, String)
+search string (Leaf _ s)   = (Just s, string) 
+search []     (Fork _ _ _) = (Nothing, "")
+search (h:t)  (Fork _ l r) = if h == '0' then search t l else search t r
 
 h = huffman $ frequencies "cavalo"
