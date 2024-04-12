@@ -1,8 +1,9 @@
 module Huffman where
 
 import Data.List
-import Synonyms
 
+type Frequency = Int
+type Symbol    = Char
 data Huffman = Leaf {frequency :: Frequency, symbol :: Symbol} | Fork {frequency :: Frequency, left :: Huffman, right :: Huffman} deriving Show
 
 instance Eq Huffman where
@@ -31,11 +32,13 @@ dictionary (Fork _ l r) = map (('0' :) <$>) (dictionary l) ++ map (('1' :) <$>) 
 encode :: String -> Huffman -> String
 encode string huffman = maybe "" id $ concat <$> (sequence $ map (`lookup` (dictionary huffman)) string)
 
--- decode :: String -> Huffman -> Maybe String
--- decode string huffman = maybe "" id $ sequence go string huffman
---     go []     _       = []
---     go string huffman = symbol : go leftover huffman where (symbol, leftover) = search string huffman where
---         search :: String -> Huffman -> (Maybe Char, String)
---         search cypher (Leaf _ s)   = (Just s, cypher) 
---         search []     (Fork _ _ _) = (Nothing, "")
---         search (h:t)  (Fork _ l r) = if h == '0' then search t l else search t r
+decode :: String -> Huffman -> String
+decode string huffman = maybe "" id $ sequence $ go string huffman where
+    go :: String -> Huffman -> [Maybe Char]
+    go []     _       = []
+    go cypher huffman = symbol : go leftover huffman where (symbol, leftover) = search cypher huffman
+
+search :: String -> Huffman -> (Maybe Char, String)
+search string (Leaf _ s)   = (Just s, string)
+search []     (Fork _ _ _) = (Nothing, "")
+search (h:t)  (Fork _ l r) = if h == '0' then search t l else search t r
