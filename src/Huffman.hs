@@ -12,8 +12,11 @@ instance Eq Huffman where
 instance Ord Huffman where
     (<=) x y = frequency x <= frequency y
 
-frequencies :: String -> [Huffman]
-frequencies s = [Leaf (length x) (head x) | x <- group $ sort s]
+frequencies :: String -> [(Symbol, Int)]
+frequencies s = [(head x, length x) | x <- group $ sort s]
+
+leaves :: String -> [Huffman]
+leaves s = [Leaf (length x) (head x) | x <- group $ sort s]
 
 huffman :: [Huffman] -> Huffman
 huffman x = build $ sort x where
